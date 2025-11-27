@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inazumadle: Galería</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* --- CORRECCIÓN VISUAL (OVERRIDE) --- */
+        body {
+            /* Aseguramos que el scroll funcione bien */
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        /* ESTO ES LO QUE ARREGLA LA COLUMNA ESTRECHA */
+        #gallery-container {
+            width: 95% !important;
+            /* Ocupa el 95% de la pantalla */
+            max-width: 1600px;
+            /* No te pases de ancho en pantallas gigantes */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .team-section {
+            width: 100%;
+            /* La sección del equipo ocupa todo el ancho disponible */
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .team-title {
+            color: #ffbb00;
+            /* Color acento directo */
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #444;
+            padding-bottom: 10px;
+            text-transform: uppercase;
+            font-style: italic;
+            text-align: left;
+            /* Título alineado a la izquierda */
+            padding-left: 10px;
+        }
+
+        .team-grid {
+            display: grid;
+            /* Rejilla flexible: Mínimo 120px por carta, si cabe más, se estira */
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            width: 100%;
+        }
+
+        /* Estilos de la tarjeta */
+        .card {
+            background: rgba(22, 33, 62, 0.95);
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: transform 0.2s;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: #ffbb00;
+            z-index: 10;
+        }
+
+        .img-preview {
+            width: 80px;
+            height: 80px;
+            background: #111;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            object-fit: cover;
+            border: 2px solid #555;
+        }
+
+        .status {
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 2px 5px;
+            border-radius: 4px;
+            position: absolute;
+            top: 5px;
+            right: 5px;
+        }
+
+        .missing {
+            background-color: #e94560;
+            color: white;
+        }
+
+        .info {
+            font-size: 0.85rem;
+            color: #fff;
+            font-weight: bold;
+            margin-bottom: 5px;
+            line-height: 1.2;
+            min-height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .id-badge {
+            background: #ffbb00;
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .filename {
+            font-family: monospace;
+            color: #888;
+            font-size: 0.7rem;
+            margin-top: 5px;
+        }
+
+        .tools input {
+            width: 100%;
+            min-width: 300px;
+            padding: 15px;
+            border-radius: 5px;
+            border: 2px solid #555;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div style="width: 100%; max-width: 1200px; margin-top: 20px;">
+        <a href="index.html"
+            style="background: var(--accent); color: black; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            ⬅ Volver a Jugar
+        </a>
+    </div>
+
+    <h1 style="margin-top: 20px; text-shadow: 2px 2px 4px black; color: #ffbb00; font-style: italic;">📁 Galería por
+        Equipos</h1>
+    <p style="color: #ccc; margin-bottom: 20px;">Revisa qué IDs faltan. Organizado por equipos.</p>
+
+    <div class="tools">
+        <input type="text" id="searchInput" placeholder="🔍 Buscar jugador o equipo..." oninput="renderGallery()">
+    </div>
+
+    <div id="gallery-container"></div>
+
+    <script>
+        const db = [
+            // RAIMON ORIGINAL (S1)
+            { id: 1, name: "Mark Evans", team: "Raimon" },
+            { id: 2, name: "Nathan Swift", team: "Raimon" },
+            { id: 3, name: "Jack Wallside", team: "Raimon" },
+            { id: 4, name: "Jim Wraith", team: "Raimon" },
+            { id: 5, name: "Tod Ironside", team: "Raimon" },
+            { id: 6, name: "Steve Grim", team: "Raimon" },
+            { id: 7, name: "Timmy Saunders", team: "Raimon" },
+            { id: 8, name: "Sam Kincaid", team: "Raimon" },
+            { id: 9, name: "Max Carson", team: "Raimon" },
+            { id: 10, name: "Axel Blaze", team: "Raimon" },
+            { id: 11, name: "Kevin Dragonfly", team: "Raimon" },
+            { id: 12, name: "Willy Glass", team: "Raimon" },
+            { id: 13, name: "Bobby Shearer", team: "Raimon" },
+            { id: 14, name: "Jude Sharp", team: "Royal Academy" },
+            { id: 15, name: "Erik Eagle", team: "Raimon" },
+            { id: 16, name: "Shadow Cimmerian", team: "Raimon" },
+
+            // RIVALES FF (S1)
+            { id: 20, name: "Joe King", team: "Royal Academy" },
+            { id: 21, name: "David Samford", team: "Royal Academy" },
+            { id: 22, name: "Daniel Hatch", team: "Royal Academy" },
+            { id: 23, name: "Derek Swing", team: "Royal Academy" },
+            { id: 30, name: "Byron Love", team: "Zeus" },
+            { id: 31, name: "Poseidon", team: "Zeus" },
+            { id: 32, name: "Apollo", team: "Zeus" },
+            { id: 33, name: "Hera", team: "Zeus" },
+            { id: 40, name: "Thomas Feldt", team: "Brainwashing" },
+            { id: 41, name: "Neil Turner", team: "Brainwashing" },
+            { id: 42, name: "Johan Tassman", team: "Occult" },
+            { id: 43, name: "Marvin Murdock", team: "Kirkwood" },
+            { id: 44, name: "Tyler Murdock", team: "Kirkwood" },
+            { id: 45, name: "Thomas Murdock", team: "Kirkwood" },
+            { id: 46, name: "Albert Green", team: "Farm" },
+
+            // CARAVANA INAZUMA (S2)
+            { id: 50, name: "Shawn Froste", team: "Instituto Alpino" },
+            { id: 51, name: "Tori Vanguard", team: "Raimon II" },
+            { id: 52, name: "Sue Hartland", team: "Triple C" },
+            { id: 53, name: "Darren LaChance", team: "Fauxshore" },
+            { id: 54, name: "Hurley Kane", team: "Mary Times" },
+            { id: 55, name: "Scott Banyan", team: "Claustro Sagrado" },
+            { id: 56, name: "Soundtown", team: "Mary Times" },
+
+            // ACADEMIA ALIEA (S2)
+            { id: 60, name: "Janus (Jordan)", team: "Tormenta Géminis" },
+            { id: 61, name: "Diam", team: "Tormenta Géminis" },
+            { id: 62, name: "Dvalin (Dave)", team: "Epsilon" },
+            { id: 63, name: "Zell", team: "Epsilon" },
+            { id: 64, name: "Metron", team: "Epsilon" },
+            { id: 65, name: "Gazelle (Bryce)", team: "Polvo Diamantes" },
+            { id: 66, name: "Burn (Claude)", team: "Prominence" },
+            { id: 67, name: "Gocker", team: "Prominence" },
+            { id: 68, name: "Xavier Foster (Xene)", team: "Genesis" },
+            { id: 69, name: "Bellatrix", team: "Genesis" },
+            { id: 70, name: "Nero", team: "Genesis" },
+            { id: 71, name: "Wittz", team: "Genesis" },
+
+            // INAZUMA JAPÓN / FFI (S3)
+            { id: 80, name: "Austin Hobbes", team: "Inazuma Japón" },
+            { id: 81, name: "Archer Hawkins", team: "Inazuma Japón" },
+            { id: 82, name: "Caleb Stonewall", team: "Inazuma Japón" },
+            { id: 83, name: "Thor Stoutberg", team: "Inazuma Japón" },
+            { id: 84, name: "Dave Quagmire", team: "Neo Japón" },
+            { id: 90, name: "Nice Dolphin", team: "Big Waves" },
+            { id: 91, name: "Joe Jones", team: "Big Waves" },
+            { id: 92, name: "Bjorn Kyle", team: "Desert Lion" },
+            { id: 93, name: "Chan-soo", team: "Fire Dragon" },
+            { id: 94, name: "Edgar Partinus", team: "Knights of Queen" },
+            { id: 95, name: "Thiago Torres", team: "The Empire" },
+            { id: 96, name: "Leone", team: "The Empire" },
+            { id: 97, name: "Mark Kruger", team: "Unicorn" },
+            { id: 98, name: "Dylan Keats", team: "Unicorn" },
+            { id: 99, name: "Paolo Bianchi", team: "Orpheus" },
+            { id: 100, name: "Hidetoshi Nakata", team: "Orpheus" },
+            { id: 101, name: "Gigi Blasi", team: "Orpheus" },
+            { id: 102, name: "Mac Robingo", team: "The Kingdom" },
+            { id: 103, name: "Lagarto", team: "The Kingdom" },
+            { id: 104, name: "Hector Helio", team: "Little Gigant" },
+            { id: 105, name: "Drago Hill", team: "Little Gigant" },
+
+            // EXTRAS
+            { id: 110, name: "Paul Peabody", team: "Raimon" },
+            { id: 111, name: "Miles Ryan", team: "Raimon Atletismo" },
+            { id: 112, name: "Saggy", team: "Scout" },
+            { id: 113, name: "Canon Evans", team: "Futuro" },
+            { id: 114, name: "Syon Blaze", team: "Futuro" },
+            { id: 115, name: "Lancer", team: "Ogre" },
+            { id: 116, name: "Malice", team: "Ogre" },
+            { id: 117, name: "Callous", team: "Ogre" },
+            { id: 120, name: "Victoria Vanguard", team: "Servicio Secreto" },
+            { id: 121, name: "Caleb Stonewall (Redux)", team: "Redux" },
+
+            // NUEVOS JUGADORES
+            { id: 122, name: "Elka Beson", team: "Royal Academy" },
+            { id: 123, name: "Camello Kun", team: "Raimon" },
+            { id: 124, name: "Elga Fota", team: "Raimon" },
+            { id: 125, name: "Whan Karlo", team: "Raimon" }
+        ];
+
+        const container = document.getElementById('gallery-container');
+        const searchInput = document.getElementById('searchInput');
+
+        function renderGallery() {
+            container.innerHTML = '';
+            const val = searchInput.value.toLowerCase();
+            const filteredPlayers = db.filter(p => p.name.toLowerCase().includes(val) || p.team.toLowerCase().includes(val));
+            const uniqueTeams = [...new Set(filteredPlayers.map(p => p.team))];
+
+            uniqueTeams.forEach(teamName => {
+                const section = document.createElement('div');
+                section.className = 'team-section';
+
+                const title = document.createElement('h2');
+                title.className = 'team-title';
+                title.textContent = teamName;
+                section.appendChild(title);
+
+                const grid = document.createElement('div');
+                grid.className = 'team-grid';
+
+                const teamPlayers = filteredPlayers.filter(p => p.team === teamName);
+
+                teamPlayers.forEach(p => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+
+                    const img = document.createElement('img');
+                    img.src = `images/${p.id}.png`;
+                    img.className = 'img-preview';
+
+                    const status = document.createElement('div');
+                    img.onerror = function () {
+                        this.src = 'https://via.placeholder.com/80x80/333333/ffffff?text=?';
+                        status.className = 'status missing';
+                        status.textContent = 'FALTA';
+                        this.style.opacity = '0.5';
+                    };
+                    // Si carga, ocultamos el status para que quede más limpio
+                    img.onload = function () { status.style.display = 'none'; }
+
+                    const name = document.createElement('div');
+                    name.className = 'info';
+                    name.textContent = p.name;
+
+                    const idBadge = document.createElement('div');
+                    idBadge.className = 'id-badge';
+                    idBadge.textContent = `ID: ${p.id}`;
+
+                    const filename = document.createElement('div');
+                    filename.className = 'filename';
+                    filename.textContent = `${p.id}.png`;
+
+                    card.appendChild(status);
+                    card.appendChild(img);
+                    card.appendChild(name);
+                    card.appendChild(idBadge);
+                    card.appendChild(filename);
+
+                    grid.appendChild(card);
+                });
+
+                section.appendChild(grid);
+                container.appendChild(section);
+            });
+
+            if (uniqueTeams.length === 0) {
+                container.innerHTML = '<p style="margin-top:50px;">No se han encontrado jugadores.</p>';
+            }
+        }
+
+        renderGallery();
+    </script>
+</body>
+
+</html>

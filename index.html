@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inazumadle: Final</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+
+<body>
+
+    <h1>⚡ Inazumadle ⚡</h1>
+
+
+    <div style="text-align: center; margin-bottom: 20px;">
+        <a href="galeria.html"
+            style="color: #ccc; text-decoration: none; border-bottom: 1px dashed #ccc; font-size: 0.9rem;">
+            📂 Ver Galería de Jugadores
+        </a>
+    </div>
+
+    <div class="game-container">
+
+        <div class="game-container">
+
+            <div class="search-container">
+                <div class="input-wrapper">
+                    <input type="text" id="guessInput" placeholder="Ej: a (y pulsa Enter)" autocomplete="off">
+                    <ul class="suggestions-list" id="suggestions"></ul>
+                </div>
+                <button id="submitBtn" onclick="checkGuess()">Chutar</button>
+            </div>
+
+            <div class="error-container">
+                <div id="errorMessage" class="error-message"></div>
+            </div>
+
+            <div class="grid" id="grid">
+                <div class="row header">
+                    <div class="header-cell">Foto</div>
+                    <div class="header-cell">Jugador</div>
+                    <div class="header-cell">Club</div>
+                    <div class="header-cell">Posición</div>
+                    <div class="header-cell">Afinidad</div>
+                    <div class="header-cell">Saga</div>
+                    <div class="header-cell">Arco</div>
+                    <div class="header-cell">Dorsal</div>
+                </div>
+            </div>
+
+            <div id="winMessage" class="winner-msg">
+                <h2 class="winner-title">🏆 ¡GOLAZO! ¡VICTORIA! 🏆</h2>
+                <p class="winner-text">Has fichado al jugador oculto.</p>
+
+                <button onclick="location.reload()" class="restart-btn">
+                    <span>⚽</span> JUGAR OTRA VEZ
+                </button>
+            </div>
+        </div>
+
+        <script src="script.js"></script>
+</body>
+
+</html>
